@@ -6,7 +6,6 @@ import 'package:flutter_application_0818/registar.dart';
 import 'firebase_options.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'top.dart';
-import 'InviteCode.dart';
 import 'package:firebase_database/firebase_database.dart'; // 追加
 
 void main() async {

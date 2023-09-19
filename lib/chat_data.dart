@@ -9,14 +9,27 @@ class ChatData {
   final String chatRoomId;
   final String currentUserUid;
   final String partnerUserUid;
+  final DatabaseReference _databaseReference;
 
-  ChatData({
-    required this.chatRoomId,
-    required this.currentUserUid,
-    required this.partnerUserUid,
-  });
- final _databaseReference = FirebaseDatabase.instance.reference();
+ChatData({
+  required this.chatRoomId,
+  required this.currentUserUid,
+  required this.partnerUserUid,
+})  : assert(partnerUserUid.isNotEmpty, 'Partner UID must not be empty.'),
+      _databaseReference = FirebaseDatabase.instance.reference();
 
+
+  void setupMessageListener(Function(Map<String, dynamic>) onMessageReceived) {
+  final messageReference = _databaseReference.child('chatRooms').child(chatRoomId).child('chats');
+  messageReference.onChildAdded.listen((event) {
+  final value = event.snapshot.value;
+  if (value != null) {
+    final data = Map<String, dynamic>.from(value as Map);
+    onMessageReceived(data);
+  }
+});
+
+  }
 
   String getCurrentUserUid() {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -30,45 +43,32 @@ class ChatData {
 
 Future<void> sendMessage(types.TextMessage message) async {
   try {
-    final messageReference = _databaseReference.child('chatRooms').child(chatRoomId).child('chatMessages');
-    final newMessageRef = messageReference.push();
-    final timestamp = DateTime.now().toUtc().millisecondsSinceEpoch;
+    if (partnerUserUid.isEmpty) {
+      throw Exception('パートナーのUIDを取得できませんでした。');
+    }
 
-    final messageData = {
+    // 新しいメッセージをFirebaseに送信
+    await _databaseReference.child('chatRooms').child(chatRoomId).child('chats').push().set({
+      'text': message.text,
+      'timestamp': DateTime.now().millisecondsSinceEpoch, 
       'senderUid': currentUserUid,
       'receiverUid': partnerUserUid,
-      'text': message.text,
-      'timestamp': timestamp,
-    };
-
-    await newMessageRef.set(messageData);
+    });
   } catch (error) {
     print('メッセージの送信中にエラーが発生しました: $error');
   }
 }
 
-void setupMessageListener(Function(Map<String, dynamic>) onMessageReceived) {
-  final messageReference = _databaseReference.child('chatRooms').child(chatRoomId).child('chatMessages');
-  messageReference.onChildAdded.listen((event) {
-    final value = event.snapshot.value;
-    if (value != null) {
-      final data = Map<String, dynamic>.from(value as Map);
-      onMessageReceived(data);
-    }
-  });
+ Future<void> saveMessageToLocal(types.TextMessage message) async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> messages = prefs.getStringList('chat_messages_${chatRoomId}') ?? [];
+  final messageJson = message.toJson();
+  messages.add(jsonEncode(messageJson));
+  await prefs.setStringList('chat_messages_${chatRoomId}', messages);
 }
 
-
-  Future<void> saveMessageToLocal(types.TextMessage message) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> messages = prefs.getStringList('chat_messages') ?? [];
-    final messageJson = message.toJson();
-    messages.add(jsonEncode(messageJson));
-    await prefs.setStringList('chat_messages', messages);
-  }
-
-  Future<List<String>> loadMessagesFromLocal() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getStringList('chat_messages') ?? [];
-  }
+Future<List<String>> loadMessagesFromLocal() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getStringList('chat_messages_${chatRoomId}') ?? [];
+}
 }

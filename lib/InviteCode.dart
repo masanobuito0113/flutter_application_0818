@@ -20,7 +20,6 @@ class _InviteCodePageState extends State<InviteCodePage> {
 
 Future<void> _joinChatRoom() async {
   final chatRoomId = _controller.text;
-
   if (chatRoomId.isEmpty) {
     setState(() {
       _errorMessage = "招待コードを入力してください";
@@ -39,13 +38,21 @@ Future<void> _joinChatRoom() async {
   }
 
   try {
-    final event = await dbRef.child('chats').child(chatRoomId).once();
+    final event = await dbRef.child('chatRooms').child(chatRoomId).once();
     final snapshot = event.snapshot;
 
-    if (snapshot.value != null) {
+  if (snapshot.value != null && snapshot.value is Map<dynamic, dynamic>) {
+  final chatRoomValue = Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
+     final ownerUid = chatRoomValue['owner_uid'] as String;
+     final partnerUid = chatRoomValue['partner_uid'] as String;
+
+
       // チャットルームIDが有効
       // ユーザーIDをチャットルームの参加者リストに追加する
-      await dbRef.child('chats').child(chatRoomId).child('users').child(userId).set(true);
+      await dbRef.child('chatRooms').child(chatRoomId).update({
+        'partner_uid': userId,  // 参加するユーザのUIDをpartner_uidとして設定
+      });
+
       _redirectToChatRoom(chatRoomId);
     } else {
       // チャットルームIDが無効
@@ -88,13 +95,14 @@ ElevatedButton(
 
     if (userId != null) {
       // 新しいチャットルームを作成
-      DatabaseReference chatRef = dbRef.child('chats').push();
+      DatabaseReference chatRef = dbRef.child('chatRooms').push();  
       chatRoomId = chatRef.key;  // ここでチャットルームのIDを取得します
 
       // 新しいチャットルームIDをユーザーデータに保存（または別の方法で保存）
-      await chatRef.set({
-        'users': [userId], // ここにチャットルームに参加するユーザーのリストを追加します
-      });
+     await chatRef.set({
+      'owner_uid': userId,  // owner_uidに現在のユーザのUIDを設定
+      'partner_uid': '',  // partner_uidはまだ未定なので空文字列を設定
+    });
 
       // 新しいチャットルームIDを次の画面に渡す
       Navigator.push(
@@ -106,7 +114,8 @@ ElevatedButton(
     }
   },
   child: Text('コードがない方はこちら'),
-              ),
+),
+
               SizedBox(height: 20),
               TextField(
                 controller: _controller,

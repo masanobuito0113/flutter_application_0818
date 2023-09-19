@@ -12,6 +12,10 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'userData.dart';
+import 'package:uuid/uuid.dart';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +26,8 @@ void main() async {
 }
 
 FirebaseDatabase database = FirebaseDatabase.instance;
+DatabaseReference databaseReference = database.reference();
+
 
 class DataInputForm extends StatefulWidget {
   @override
@@ -37,22 +43,25 @@ class _DataInputFormState extends State<DataInputForm> {
 
   // アップロード処理
   void _upload() async {
-    final pickerFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickerFile == null) {
-      return;
-    }
-    File file = File(pickerFile.path);
-    FirebaseStorage storage = FirebaseStorage.instance;
-    try {
-      await storage.ref("UL/upload-pic.png").putFile(file);
-      setState(() {
-        _img = null;
-        _text = const Text("UploadDone");
-      });
-    } catch (e) {
-      print(e);
-    }
+  final pickerFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  if (pickerFile == null) {
+    return;
   }
+  File file = File(pickerFile.path);
+  FirebaseStorage storage = FirebaseStorage.instance;
+  try {
+    final ref = storage.ref("UL/${Uuid().v1()}.png");
+    await ref.putFile(file);
+    final url = await ref.getDownloadURL();
+    setState(() {
+      _img = Image.network(url); // 画像のURLをImageウィジェットにセット
+      _text = const Text("UploadDone");
+    });
+  } catch (e) {
+    print(e);
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +156,7 @@ FloatingActionButton(
           'アイコン用の写真をUPする',
           overflow: TextOverflow.ellipsis, // 文字がはみ出した場合に省略記号で表示
           style: TextStyle(
-            fontSize: 16, // フォントサイズを調整
+            fontSize: 10, // フォントサイズを調整
             color: Colors.black, // テキストの色を設定
           ),
         ),
@@ -178,33 +187,43 @@ Row(
 
 ElevatedButton(
   onPressed: () async {
-    if (_fbKey.currentState!.saveAndValidate()) {
-      final formData = _fbKey.currentState!.value;
-      final DatabaseReference databaseReference = FirebaseDatabase.instance.reference();
+  if (_fbKey.currentState!.saveAndValidate()) {
+    final formData = _fbKey.currentState!.value;
 
-      final Map<String, dynamic> userData = {
-        'name': formData['name'],
-        'nickname': formData['nickname'],
-        'email': formData['email'],
-        'birthdate': formData['birthdate'].toString(),
-        'wedding_anniversary': formData['wedding_anniversary'].toString(),
-        // ...
-      };
+      // 画像URLの取得（ここで_null check_を行ってください）
+final imageUrl = _img == null ? '' : (_img!.image as NetworkImage).url;
 
-      for (int i = 0; i < anniversaryFields.length; i++) {
-        final anniversaryDescriptionKey = 'anniversary_description_$i';
-        final anniversaryDateKey = 'anniversary_date_$i';
-        userData[anniversaryDescriptionKey] = formData[anniversaryDescriptionKey];
-        userData[anniversaryDateKey] = formData[anniversaryDateKey].toString();
+
+       List<Anniversary> anniversaries = [];
+       for (int i = 0; i < anniversaryFields.length; i++) {
+      final anniversaryDescriptionKey = 'anniversary_description_$i';
+      final anniversaryDateKey = 'anniversary_date_$i';
+
+      final anniversaryDate = formData[anniversaryDateKey];
+      if (anniversaryDate != null) {
+        anniversaries.add(Anniversary(
+          description: formData[anniversaryDescriptionKey],
+          date: anniversaryDate,
+        ));
       }
+    }
+
+      UserData userData = UserData(
+        name: formData['name'],
+        nickname: formData['nickname'],
+        email: formData['email'],
+        birthdate: formData['birthdate'],
+        weddingAnniversary: formData['wedding_anniversary'], 
+        anniversaries: anniversaries,
+        imagePath: imageUrl, 
+      );
 
       final user = FirebaseAuth.instance.currentUser;
       final userId = user?.uid;
 
       if (userId != null) {
-        await databaseReference.child('users').child(userId).set(userData);
+        await databaseReference.child('users').child(userId).set(userData.toMap());
 
-        // この部分を削除し、直接InviteCodePageに移動する
         Navigator.push(
           context,
           MaterialPageRoute(
