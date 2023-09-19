@@ -46,17 +46,31 @@ print('chatRoomValue: $chatRoomValue');
 print('chatRoomValue runtime type: ${chatRoomValue.runtimeType}');
 
 if (chatRoomValue != null && chatRoomValue is Map) {
-  final chatRoomMap = Map<String, dynamic>.from(chatRoomValue.values.first as Map);
-
-  if (chatRoomMap['owner_uid'] == userUid) {
-    partnerUserUid = chatRoomMap['partner_uid'];
+  // Find the correct sub-map containing owner_uid and partner_uid
+  Map<String, dynamic>? chatRoomMap;
+  for (var subMap in chatRoomValue.values) {
+    if (subMap is Map && subMap.containsKey('owner_uid') && subMap.containsKey('partner_uid')) {
+      chatRoomMap = Map<String, dynamic>.from(subMap as Map);
+      break;
+    }
+  }
+  
+  // If we found a valid chatRoomMap, extract the partner UID
+  if (chatRoomMap != null) {
+    if (chatRoomMap['owner_uid'] == userUid) {
+      partnerUserUid = chatRoomMap['partner_uid'];
+    } else {
+      partnerUserUid = chatRoomMap['owner_uid'];
+    }
   } else {
-    partnerUserUid = chatRoomMap['owner_uid'];
+    print('Could not find a chat room map with owner_uid and partner_uid.');
+    return;
   }
 } else {
   print('Chat room data is null or not a map');
   return;
 }
+
 
 
 
