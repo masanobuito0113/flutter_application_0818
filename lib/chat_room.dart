@@ -6,6 +6,8 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'chat_data.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'make_chat_ai.dart'; 
+
 
 class ChatRoomPage extends StatefulWidget {
   final String chatRoomId;
@@ -120,10 +122,6 @@ print('Partner UID: $partnerUserUid');
   });
 }
 
-
-
-
-
   Future<void> _loadMessages() async {
     if (!_isDataInitialized) {
       return;
@@ -158,19 +156,21 @@ print('Partner UID: $partnerUserUid');
     );
   }
 
-  void _handleSendPressed(types.PartialText message) {
-    if (!_isDataInitialized) {
-      print('Data is not initialized yet.');
-      return;
-    }
-
-    final textMessage = types.TextMessage(
-      author: _user,
-      id: Uuid().v4(),
-      text: message.text,
-      createdAt: DateTime.now().millisecondsSinceEpoch,
-    );
-    _chatData.sendMessage(textMessage);
-    _chatData.saveMessageToLocal(textMessage);
+void _handleSendPressed(types.PartialText message) async {
+  if (!_isDataInitialized) {
+    print('Data is not initialized yet.');
+    return;
   }
+
+  String transformedMessage = await makeChatGentler(message.text);
+
+  final textMessage = types.TextMessage(
+    author: _user,
+    id: Uuid().v4(),
+    text: transformedMessage,
+    createdAt: DateTime.now().millisecondsSinceEpoch,
+  );
+  _chatData.sendMessage(textMessage);
+  _chatData.saveMessageToLocal(textMessage);
+}
 }
