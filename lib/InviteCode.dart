@@ -113,10 +113,10 @@ ElevatedButton(
       );
     }
   },
-  child: Text('コードがない方はこちら'),
+  child: const Text('コードがない方はこちら'),
 ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               TextField(
                 controller: _controller,
                 decoration: InputDecoration(
@@ -124,10 +124,10 @@ ElevatedButton(
                   errorText: _errorMessage,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _joinChatRoom,
-                child: Text('招待コードを送信'),
+                child: const Text('招待コードを送信'),
               ),
             ],
           ),
