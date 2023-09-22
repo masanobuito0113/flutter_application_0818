@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_0818/top.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'chat_data.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'make_chat_ai.dart'; 
+
 
 
 class ChatRoomPage extends StatefulWidget {
@@ -144,7 +146,21 @@ print('Partner UID: $partnerUserUid');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar(    
+        leading: IconButton(
+      icon: Icon(Icons.arrow_back, color: Colors.black),
+      onPressed: () {
+  if (Navigator.canPop(context)) {
+    Navigator.of(context).pop();
+  } else {
+    Navigator.push(
+     context,
+     MaterialPageRoute(builder: (context) => TopPage()),
+   );
+  }
+},
+    ),
+
         title: const Text('Chatroom', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
       ),

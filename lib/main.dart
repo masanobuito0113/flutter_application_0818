@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
-import 'header.dart';
+import 'parts/header.dart';
 import 'top.dart'; // トップ画面のインポート
 import 'login.dart'; // ログイン画面のインポート
 import 'package:firebase_core/firebase_core.dart'; // Firebaseの初期化に必要なパッケージ
