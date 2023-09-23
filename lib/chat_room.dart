@@ -145,22 +145,35 @@ print('Partner UID: $partnerUserUid');
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(    
+  return WillPopScope(
+    onWillPop: () async {
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+        return false;
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TopPage()),
+        );
+        return false;
+      }
+    },
+    child: Scaffold(
+      appBar: AppBar(
         leading: IconButton(
-      icon: Icon(Icons.arrow_back, color: Colors.black),
-      onPressed: () {
-  if (Navigator.canPop(context)) {
-    Navigator.of(context).pop();
-  } else {
-    Navigator.push(
-     context,
-     MaterialPageRoute(builder: (context) => TopPage()),
-   );
-  }
-},
-    ),
-
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.of(context).pop();
+            } else {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => TopPage()),
+                (route) => false, 
+              );
+            }
+          },
+        ),
         title: const Text('Chatroom', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
       ),
@@ -169,8 +182,10 @@ print('Partner UID: $partnerUserUid');
         messages: _messages,
         onSendPressed: _isDataInitialized ? _handleSendPressed : (message) {},
       ),
-    );
-  }
+    ),
+  );
+}
+
 
 void _handleSendPressed(types.PartialText message) async {
   if (!_isDataInitialized) {

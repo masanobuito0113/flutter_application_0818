@@ -63,49 +63,57 @@ class _MyHomePageState extends State<MyHomePage> {
       return _events[day] ?? [];
     }
 
-return Scaffold(
-  appBar: AppBar(
-    leading: IconButton(
-      icon: Icon(Icons.arrow_back),
-      onPressed: () {
-      Navigator.push(
+  return WillPopScope(
+    onWillPop: () async {
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => TopPage()),
       );
-      },
+      return false;
+    },
+    child: Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => TopPage()),
+            );
+          },
+        ),
+        title: Text(widget.title),
+      ),
+      body: Column(
+        children: [
+          TableCalendar(
+            firstDay: DateTime.utc(2022, 4, 1),
+            lastDay: DateTime.utc(2025, 12, 31),
+            eventLoader: getEvent, //追記
+            selectedDayPredicate: (day) {
+              return isSameDay(_selected, day);
+            },
+            onDaySelected: (selected, focused) {
+              if (!isSameDay(_selected, selected)) {
+                setState(() {
+                  _selected = selected;
+                  _focused = focused;
+                });
+              }
+            },
+            focusedDay: _focused,
+          ),
+          ListView(
+            shrinkWrap: true,
+            children: getEvent(_selected!)
+                .map((event) => ListTile(
+                      title: Text(event.toString()),
+                    ))
+                .toList(),
+          )
+        ],
+      ),
     ),
-    title: Text(widget.title),
-  ),
-  body: Column(children: [
-    TableCalendar(
-      firstDay: DateTime.utc(2022, 4, 1),
-      lastDay: DateTime.utc(2025, 12, 31),
-      eventLoader: getEvent, //追記
-      selectedDayPredicate: (day) {
-        return isSameDay(_selected, day);
-      },
-      onDaySelected: (selected, focused) {
-        if (!isSameDay(_selected, selected)) {
-          setState(() {
-            _selected = selected;
-            _focused = focused;
-          });
-        }
-      },
-      focusedDay: _focused,
-    ),
-    
-    ListView(
-      shrinkWrap: true,
-      children: getEvent(_selected!)
-          .map((event) => ListTile(
-                title: Text(event.toString()),
-              ))
-          .toList(),
-    )
-    
-  ]),
-);
-
-  }
+  );
+}
 }

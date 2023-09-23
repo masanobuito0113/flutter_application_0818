@@ -6,10 +6,18 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_application_0818/parts/custom_bottom_navigation_bar.dart'; 
 
 
-class TopPage extends StatelessWidget {
+class TopPage extends StatefulWidget {
   final String? chatRoomId;
 
   TopPage({this.chatRoomId});
+
+  @override
+  _TopPageState createState() => _TopPageState();
+}
+
+class _TopPageState extends State<TopPage> {
+  int _selectedIndex = 0;
+  PageController _pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +25,30 @@ class TopPage extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
-      // home: ChatRoomButton(chatRoomId: chatRoomId),
-       home: Scaffold(
-        // CustomBottomNavigationBarをScaffoldのbottomNavigationBarに配置
-        bottomNavigationBar: CustomBottomNavigationBar(selectedIndex: 0),
-        body: ChatRoomButton(chatRoomId: chatRoomId),
+      home: Scaffold(
+        bottomNavigationBar: CustomBottomNavigationBar(
+          selectedIndex: _selectedIndex,
+          onItemSelected: (index) {
+            _pageController.animateToPage(
+              index,
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
+        ),
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          children: [
+            ChatRoomButton(chatRoomId: widget.chatRoomId),
+            SchedulePage(),
+            FlowerPointPage(),
+          ],
+        ),
       ),
     );
   }
@@ -35,19 +62,22 @@ class ChatRoomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ListView(
-          padding: EdgeInsets.all(16.0),
-          children: [
+      body: Stack(
+        children: [
+          ListView(
+            padding: EdgeInsets.all(16.0),
+            children: [
             TextButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ChatRoomPage(chatRoomId: chatRoomId ?? ''), // ここでchatRoomIdを渡します
+          
                   ),
                 );
               },
+          
               child: Text(
                 'Chat',
                 style: GoogleFonts.archivoBlack(
@@ -89,6 +119,7 @@ class ChatRoomButton extends StatelessWidget {
                 ),
               ),
             ),
+          
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         height: 150,
@@ -142,7 +173,7 @@ class ChatRoomButton extends StatelessWidget {
                                   ),
                                 ),
                                 child: const Icon(
-                                  Icons.sentiment_very_satisfied, 
+                                  Icons.sentiment_neutral, 
                                   color: Color(0xFF000000),
                                   size: 48.0,
                                 ),
@@ -184,8 +215,18 @@ class ChatRoomButton extends StatelessWidget {
                           ],
                         ),
                       ),
-
-            TextButton(
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  color: Colors.white,
+                  child: PartnersFeeling(),
+                ),
+              
+              ),
+              TextButton(
               onPressed: () {
                 // 他のボタンの処理
               },
@@ -197,12 +238,73 @@ class ChatRoomButton extends StatelessWidget {
                   fontSize: 48.0,
                 ),
               ),
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 }
 
+class CustomBottomNavigationBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemSelected;
 
+  CustomBottomNavigationBar({
+    required this.selectedIndex,
+    required this.onItemSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.chat),
+          label: 'Chat',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.schedule),
+          label: 'Schedule',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.local_florist),
+          label: 'Flower',
+        ),
+      ],
+      currentIndex: selectedIndex,
+      onTap: onItemSelected,
+    );
+  }
+}
+
+class PartnersFeeling extends StatefulWidget {
+  @override
+  _PartnersFeelingState createState() => _PartnersFeelingState();
+}
+
+class _PartnersFeelingState extends State<PartnersFeeling> {
+  IconData partnersFeelingIcon = Icons.sentiment_very_satisfied;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          "Partner's Feeling → ",
+          style: GoogleFonts.archivoBlack(
+            textStyle: Theme.of(context).textTheme.headline4,
+            color: Color(0xFF000000),
+            fontSize: 24.0,
+          ),
+        ),
+        Icon(
+          partnersFeelingIcon,
+          size: 48.0,
+          color: Color(0xFF000000),
+        ),
+      ],
+    );
+  }
+}

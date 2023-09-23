@@ -8,25 +8,38 @@ class FlowerPointPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-      icon: Icon(Icons.arrow_back, color: Colors.black),
-      onPressed: () {
-  if (Navigator.canPop(context)) {
-    Navigator.of(context).pop();
-  } else {
-    Navigator.push(
-     context,
-     MaterialPageRoute(builder: (context) => TopPage()),
-   );
-  }
-},
-    ),
-        title: Text('Flower Point Page'),
-      ),
-      body: Center(
-        child: Text('This is an empty page'),
+    return WillPopScope(
+      onWillPop: () async {
+        if (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => TopPage()),
+          );
+        }
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () {
+              if (Navigator.canPop(context)) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => TopPage()),
+                );
+              }
+            },
+          ),
+          title: const Text('Flower Point Page'),
+        ),
+        body: Center(
+          child: const Text('This is an empty page'),
+        ),
       ),
     );
   }
