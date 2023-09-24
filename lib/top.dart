@@ -3,8 +3,7 @@ import 'package:flutter_application_0818/flowerPoint.dart';
 import 'package:flutter_application_0818/schedule.dart';
 import 'chat_room.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_application_0818/parts/custom_bottom_navigation_bar.dart'; 
-
+// import 'package:flutter_application_0818/parts/custom_bottom_navigation_bar.dart';
 
 class TopPage extends StatefulWidget {
   final String? chatRoomId;
@@ -26,16 +25,16 @@ class _TopPageState extends State<TopPage> {
         primaryColor: Colors.white,
       ),
       home: Scaffold(
-        bottomNavigationBar: CustomBottomNavigationBar(
-          selectedIndex: _selectedIndex,
-          onItemSelected: (index) {
-            _pageController.animateToPage(
-              index,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            );
-          },
-        ),
+        // bottomNavigationBar: CustomBottomNavigationBar(
+        //   selectedIndex: _selectedIndex,
+        //   onItemSelected: (index) {
+        //     setState(() {
+        //       _selectedIndex = index;
+        //     });
+        //     _pageController.animateToPage(index,
+        //         duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+        //   },
+        // ),
         body: PageView(
           controller: _pageController,
           onPageChanged: (index) {
@@ -44,7 +43,7 @@ class _TopPageState extends State<TopPage> {
             });
           },
           children: [
-            ChatRoomButton(chatRoomId: widget.chatRoomId),
+            ChatRoom(chatRoomId: widget.chatRoomId),
             SchedulePage(),
             FlowerPointPage(),
           ],
@@ -54,10 +53,10 @@ class _TopPageState extends State<TopPage> {
   }
 }
 
-class ChatRoomButton extends StatelessWidget {
+class ChatRoom extends StatelessWidget {
   final String? chatRoomId;
 
-  const ChatRoomButton({Key? key, this.chatRoomId}) : super(key: key);
+  const ChatRoom({Key? key, this.chatRoomId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +108,7 @@ class ChatRoomButton extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (context) => FlowerPointPage()),
                  );
+                
               },
               child: Text(
                 'FlowerPoint', // ボタンのテキスト
@@ -135,7 +135,7 @@ class ChatRoomButton extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              'Send your feelings!!', 
+                              'Send your feelings!!!!', 
                               style: GoogleFonts.archivoBlack(
                                 textStyle: Theme.of(context).textTheme.headline4,
                                 color: Color(0xFF000000),
@@ -247,38 +247,6 @@ class ChatRoomButton extends StatelessWidget {
   }
 }
 
-class CustomBottomNavigationBar extends StatelessWidget {
-  final int selectedIndex;
-  final Function(int) onItemSelected;
-
-  CustomBottomNavigationBar({
-    required this.selectedIndex,
-    required this.onItemSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat),
-          label: 'Chat',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.schedule),
-          label: 'Schedule',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.local_florist),
-          label: 'Flower',
-        ),
-      ],
-      currentIndex: selectedIndex,
-      onTap: onItemSelected,
-    );
-  }
-}
-
 class PartnersFeeling extends StatefulWidget {
   @override
   _PartnersFeelingState createState() => _PartnersFeelingState();
@@ -308,3 +276,37 @@ class _PartnersFeelingState extends State<PartnersFeeling> {
     );
   }
 }
+
+
+
+// class CustomBottomNavigationBar extends StatelessWidget {
+//   final int selectedIndex;
+//   final Function(int) onItemSelected;
+
+//   CustomBottomNavigationBar({
+//     required this.selectedIndex,
+//     required this.onItemSelected,
+//   });
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return BottomNavigationBar(
+//       items: const <BottomNavigationBarItem>[
+//         BottomNavigationBarItem(
+//           icon: Icon(Icons.chat),
+//           label: 'Chat',
+//         ),
+//         BottomNavigationBarItem(
+//           icon: Icon(Icons.schedule),
+//           label: 'Schedule',
+//         ),
+//         BottomNavigationBarItem(
+//           icon: Icon(Icons.local_florist),
+//           label: 'Flower',
+//         ),
+//       ],
+//       currentIndex: selectedIndex,
+//       onTap: onItemSelected,
+//     );
+//   }
+// }
