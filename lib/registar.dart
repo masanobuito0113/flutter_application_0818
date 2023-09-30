@@ -17,13 +17,13 @@ import 'package:uuid/uuid.dart';
 
 
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(DataInputForm());
-}
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+//   );
+//   runApp(DataInputForm());
+// }
 
 FirebaseDatabase database = FirebaseDatabase.instance;
 DatabaseReference databaseReference = database.reference();

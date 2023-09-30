@@ -7,7 +7,7 @@ import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'chat_data.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'make_chat_ai.dart'; 
+
 
 
 
@@ -44,29 +44,27 @@ Future<void> _initData() async {
 
   final dbRef = FirebaseDatabase.instance.reference();
   final chatRoomDataSnapshot = await dbRef.child('chatRooms').child(widget.chatRoomId).once();
-final chatRoomValue = chatRoomDataSnapshot.snapshot.value;
+  final chatRoomValue = Map<String, dynamic>.from(chatRoomDataSnapshot.snapshot.value as Map);
+
 
 print('chatRoomValue: $chatRoomValue');
 print('chatRoomValue runtime type: ${chatRoomValue.runtimeType}');
 
-if (chatRoomValue != null && chatRoomValue is Map) {
-  // Find the correct sub-map containing owner_uid and partner_uid
-  Map<String, dynamic>? chatRoomMap;
-  for (var subMap in chatRoomValue.values) {
-    if (subMap is Map && subMap.containsKey('owner_uid') && subMap.containsKey('partner_uid')) {
-      chatRoomMap = Map<String, dynamic>.from(subMap as Map);
-      break;
+if (chatRoomValue != null) {
+  bool chatRoomMapFound = false;
+  for (var key in chatRoomValue.keys) {
+    if (chatRoomValue[key].containsKey('owner_uid') && chatRoomValue[key].containsKey('partner_uid')) {
+      chatRoomMapFound = true;
+      if (chatRoomValue[key]['owner_uid'] == userUid) {
+        partnerUserUid = chatRoomValue[key]['partner_uid'];
+      } else {
+        partnerUserUid = chatRoomValue[key]['owner_uid'];
+      }
+      break; // exit loop once we've found the correct chatRoom
     }
   }
-  
-  // If we found a valid chatRoomMap, extract the partner UID
-  if (chatRoomMap != null) {
-    if (chatRoomMap['owner_uid'] == userUid) {
-      partnerUserUid = chatRoomMap['partner_uid'];
-    } else {
-      partnerUserUid = chatRoomMap['owner_uid'];
-    }
-  } else {
+
+  if (!chatRoomMapFound) {
     print('Could not find a chat room map with owner_uid and partner_uid.');
     return;
   }
@@ -74,9 +72,22 @@ if (chatRoomValue != null && chatRoomValue is Map) {
   print('Chat room data is null or not a map');
   return;
 }
-
-
-
+  
+  // If we found a valid chatRoomMap, extract the partner UID
+//   if (chatRoomMap != null) {
+//     if (chatRoomMap['owner_uid'] == userUid) {
+//       partnerUserUid = chatRoomMap['partner_uid'];
+//     } else {
+//       partnerUserUid = chatRoomMap['owner_uid'];
+//     }
+//   } else {
+//     print('Could not find a chat room map with owner_uid and partner_uid.');
+//     return;
+//   }
+// } else {
+//   print('Chat room data is null or not a map');
+//   return;
+// }
 
 
 if (partnerUserUid == null || partnerUserUid!.isEmpty) {
@@ -194,7 +205,9 @@ void _handleSendPressed(types.PartialText message) async {
     return;
   }
 
-  String transformedMessage = await makeChatGentler(message.text);
+  // Firebase Functionの接続をカット
+  // String transformedMessage = await makeChatGentler(message.text);
+  String transformedMessage = message.text;
 
   final textMessage = types.TextMessage(
     author: _user,

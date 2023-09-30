@@ -130,22 +130,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FutureBuilder(
-        // Firebaseの初期化が完了したかどうかを確認
-        future: Firebase.initializeApp(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return userAlreadyLoggedIn()
+      home: userAlreadyLoggedIn()
                 ? Scaffold(
                     appBar: Header(),
                     body: TopPage(),
                   )
-                : LoginPage();
-          }
-          // Firebaseの初期化がまだ完了していない場合はローディング画面などを表示
-          return CircularProgressIndicator();
-        },
-      ),
+                : LoginPage()
     );
+          }
+  // Firebaseの初期化がまだ完了していない場合はローディング画面などを表示
+        
   }
-}
+
