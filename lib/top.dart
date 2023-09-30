@@ -3,6 +3,7 @@ import 'package:flutter_application_0818/flowerPoint.dart';
 import 'package:flutter_application_0818/schedule.dart';
 import 'chat_room.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 // import 'package:flutter_application_0818/parts/custom_bottom_navigation_bar.dart';
 
 class TopPage extends StatefulWidget {
@@ -102,6 +103,7 @@ class ChatRoom extends StatelessWidget {
                 ),
               ),
             ),
+            
             TextButton(
               onPressed: () {
                  Navigator.push(
@@ -119,30 +121,33 @@ class ChatRoom extends StatelessWidget {
                 ),
               ),
             ),
-          
+                      const SizedBox(height: 30.0),
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 16.0),
                         height: 150,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.grey[200], // 背景色
+                        color: Colors.grey[200], // 背景色
                           borderRadius: BorderRadius.circular(10.0), // 角を丸くする
                           border: Border.all(
                             color: Colors.black, // フチの色
                             width: 4.0, // フチの太さ
                           ),
                         ),
-                        child: Column(
+                        
+                        child:
+                         Column(
                           children: [
                             Text(
-                              'Send your feelings!!!!', 
+                              'Send your feelings!!!', 
                               style: GoogleFonts.archivoBlack(
                                 textStyle: Theme.of(context).textTheme.headline4,
                                 color: Color(0xFF000000),
                                 fontSize: 30.0,
-                            )),
+                            )
+                            ),
                                 SizedBox(height: 10.0), // スペースを追加
-                                Row(
+                              Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                             ElevatedButton(
@@ -210,22 +215,25 @@ class ChatRoom extends StatelessWidget {
                                       size: 48.0,
                                     ),
                                   ),
-                              ],
-                            ),
+                        ],
+                   
+                      
+              // Positioned(
+              //   bottom: 0,
+              //   left: 0,
+              //   right: 0,
+              //   child: Container(
+              //     padding: EdgeInsets.all(30.0),
+                  // color: Colors.white,
+                  // child: PartnersFeeling(),
+                              ),
                           ],
-                        ),
                       ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.all(16.0),
-                  color: Colors.white,
-                  child: PartnersFeeling(),
-                ),
+                    ),
+
+              PartnersFeeling(),
               
-              ),
+                          
               TextButton(
               onPressed: () {
                 // 他のボタンの処理

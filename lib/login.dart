@@ -8,13 +8,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'top.dart';
 import 'package:firebase_database/firebase_database.dart'; // 追加
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(LoginPage());
-}
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(
+//     options: DefaultFirebaseOptions.currentPlatform,
+//   );
+//   runApp(LoginPage());
+// }
 
 class LoginPage extends StatelessWidget {
   // ユーザーのログイン状態を確認するメソッド
