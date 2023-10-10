@@ -41,7 +41,7 @@ ChatData({
     }
   }
 
-Future<void> sendMessage(types.TextMessage message) async {
+Future<void> sendMessage(types.TextMessage message, String senderUid, String receiverUid) async {
   try {
     if (partnerUserUid.isEmpty) {
       throw Exception('パートナーのUIDを取得できませんでした。');
@@ -51,8 +51,8 @@ Future<void> sendMessage(types.TextMessage message) async {
     await _databaseReference.child('chatRooms').child(chatRoomId).child('chats').push().set({
       'text': message.text,
       'timestamp': DateTime.now().millisecondsSinceEpoch, 
-      'senderUid': currentUserUid,
-      'receiverUid': partnerUserUid,
+      'senderUid': senderUid,
+      'receiverUid': receiverUid,
     });
   } catch (error) {
     print('メッセージの送信中にエラーが発生しました: $error');

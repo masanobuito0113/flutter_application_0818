@@ -215,7 +215,7 @@ void _handleSendPressed(types.PartialText message) async {
     text: transformedMessage,
     createdAt: DateTime.now().millisecondsSinceEpoch,
   );
-  _chatData.sendMessage(textMessage);
+  _chatData.sendMessage(textMessage, _user.id, partnerUserUid!);
   _chatData.saveMessageToLocal(textMessage);
 }
 }

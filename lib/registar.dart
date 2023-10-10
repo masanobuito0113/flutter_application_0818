@@ -150,7 +150,7 @@ FloatingActionButton(
   child: const Row(
     children: [
       Icon(Icons.upload_outlined), // アップロードアイコン
-      SizedBox(width: 8), // アイコンとテキストの間隔を設定
+      SizedBox(width: 20), // アイコンとテキストの間隔を設定
       Expanded(
         child: Text(
           'アイコン用の写真をUPする',
